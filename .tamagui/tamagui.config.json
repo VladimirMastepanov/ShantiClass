@@ -27600,7 +27600,7 @@
         "borderColorHover": "hsla(0, 0%, 93%, 1)",
         "borderColorPress": "hsla(0, 0%, 88%, 1)",
         "borderColorFocus": "hsla(0, 0%, 91%, 1)",
-        "color": "hsla(0, 0%, 9%, 1)",
+        "color": "#444",
         "colorHover": "hsla(0, 0%, 42%, 1)",
         "colorPress": "hsla(0, 0%, 9%, 1)",
         "colorFocus": "hsla(0, 0%, 42%, 1)",

@@ -45,7 +45,7 @@ export default function RootLayout() {
             <ThemeProvider value={DefaultTheme}>
               <Stack screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="(tabs)" />
-                <Stack.Screen name="profile" />
+                <Stack.Screen name="statistic" />
               </Stack>
             </ThemeProvider>
           </TamaguiProvider>

@@ -1,8 +1,8 @@
-import { Modal, View } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { Modal, Pressable, View } from "react-native";
 import { Input, XStack, Text, YStack, Checkbox, Button } from "tamagui";
 import { StudentsDescription } from "../types/dbTypes";
 import { useState } from "react";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 interface ModalEdithProps {
   modalVisible: boolean;
@@ -23,8 +23,37 @@ export const ModalWindow = (props: ModalEdithProps) => {
   );
   const [additional, setAdditional] = useState(editedStudent?.additional || "");
 
+  const [openCalendar, setOpenCalendar] = useState(false);
+
+  const handleChangeData = (event: any, selectDate?: Date) => {
+    if (event.type === "set" && selectDate) {
+      setStartSubscription(selectDate.toLocaleDateString());
+    }
+    setOpenCalendar(false);
+  };
+
+  const handleSveChanges = () => {
+
+       //сохраняю изменения в базу
+
+    //clean state 
+    setName('');
+    setInstagram('');
+    setPaidLessons(0);
+    setStartSubscription('');
+    setAdditional('');
+
+    closeModal();
+  }
+
   const handleCloseModal = () => {
-    //сохраняю изменения в базу
+    //clean state 
+    setName('');
+    setInstagram('');
+    setPaidLessons(0);
+    setStartSubscription('');
+    setAdditional('');
+
     closeModal();
   };
 
@@ -66,9 +95,9 @@ export const ModalWindow = (props: ModalEdithProps) => {
             <Text fontSize={18} fontWeight="bold">
               Информация о студенте
             </Text>
-            <TouchableOpacity onPress={closeModal}>
+            <Pressable onPress={closeModal}>
               <Text fontSize={24}>×</Text>
-            </TouchableOpacity>
+            </Pressable>
           </XStack>
 
           <YStack space={12}>
@@ -93,8 +122,21 @@ export const ModalWindow = (props: ModalEdithProps) => {
               />
             </YStack>
 
-            <XStack style={{ alignItems: "center" }} space={8}>
-              <Text>Абонемент c: {startSubscription}</Text>
+            <XStack style={{ alignItems: "center" }} >
+              <View style={{ flex: 2 }}><Text>Абонемент c: {startSubscription}</Text></View>
+              
+              <View style={{ flex: 1 }}>
+                <Button onPress={() => setOpenCalendar(true)}>change</Button>
+
+                {openCalendar && (
+                  <DateTimePicker
+                    value={new Date()}
+                    onChange={handleChangeData}
+                    mode="date"
+                    display="calendar"
+                  />
+                )}
+              </View>
             </XStack>
 
             <YStack>
@@ -102,7 +144,9 @@ export const ModalWindow = (props: ModalEdithProps) => {
               <Input
                 value={additional || ""}
                 onChangeText={(text) => setAdditional(text)}
-                keyboardType="numeric"
+                multiline={true}
+                numberOfLines={6}
+                verticalAlign='top'
               />
             </YStack>
 
@@ -112,15 +156,15 @@ export const ModalWindow = (props: ModalEdithProps) => {
             >
               <Button
                 style={{ backgroundColor: "#e74c3c", color: "white" }}
-                onPress={closeModal}
+                onPress={handleCloseModal}
               >
-                Отмена
+                Close
               </Button>
               <Button
                 style={{ backgroundColor: "#2ecc71", color: "white" }}
-                onPress={handleCloseModal}
+                onPress={handleSveChanges}
               >
-                Сохранить
+                Save
               </Button>
             </XStack>
           </YStack>

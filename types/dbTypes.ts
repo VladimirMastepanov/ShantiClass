@@ -9,6 +9,7 @@ export interface StudentsDescription {
   startSubscription: string | null; // Date
   paidLessons: number | null;
   additional: string | null;
+  history: string[]; // array of dates: dd/mm/yy
 }
 
 export interface VisitStatisticDescription {
@@ -16,4 +17,10 @@ export interface VisitStatisticDescription {
   date: Date;
   singed: number;
   unSinged: number;
+}
+
+
+export interface StudentsHistory {
+  date: Date;
+  names: string[];
 }

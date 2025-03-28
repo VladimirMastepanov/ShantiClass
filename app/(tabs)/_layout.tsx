@@ -10,7 +10,6 @@ import STUDENTS from "../../STUDENTS.json";
 import { StudentsDescription } from "../../types/dbTypes";
 import { ModalWindow } from "../../components/ModalWindow";
 import DateTimePicker, {
-  DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
 
 interface CountersDescription {
@@ -163,7 +162,7 @@ export default function ShantiClass() {
             autoCorrect={false}
           />
           <Button
-            onPress={() => {}}
+            onPress={() => handleOpenModal()}
             style={{
               backgroundColor: "#2ecc71",
               height: 40,

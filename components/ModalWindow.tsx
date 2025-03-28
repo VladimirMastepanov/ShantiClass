@@ -3,6 +3,7 @@ import { Input, XStack, Text, YStack, Checkbox, Button } from "tamagui";
 import { StudentsDescription } from "../types/dbTypes";
 import { useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { ModalDateList } from "./ModalDateList";
 
 interface ModalEdithProps {
   modalVisible: boolean;
@@ -21,9 +22,14 @@ export const ModalWindow = (props: ModalEdithProps) => {
   const [startSubscription, setStartSubscription] = useState(
     editedStudent?.startSubscription || ""
   );
+  const [visitHistory] = useState(editedStudent?.history || []);
   const [additional, setAdditional] = useState(editedStudent?.additional || "");
 
   const [openCalendar, setOpenCalendar] = useState(false);
+
+  const [openModalDateList, setOpenModalDateList] = useState(false);
+
+  const handleCloseDateListModal = () => setOpenModalDateList(false);
 
   const handleChangeData = (event: any, selectDate?: Date) => {
     if (event.type === "set" && selectDate) {
@@ -33,26 +39,25 @@ export const ModalWindow = (props: ModalEdithProps) => {
   };
 
   const handleSveChanges = () => {
+    //сохраняю изменения в базу
 
-       //сохраняю изменения в базу
-
-    //clean state 
-    setName('');
-    setInstagram('');
+    //clean state
+    setName("");
+    setInstagram("");
     setPaidLessons(0);
-    setStartSubscription('');
-    setAdditional('');
+    setStartSubscription("");
+    setAdditional("");
 
     closeModal();
-  }
+  };
 
   const handleCloseModal = () => {
-    //clean state 
-    setName('');
-    setInstagram('');
+    //clean state
+    setName("");
+    setInstagram("");
     setPaidLessons(0);
-    setStartSubscription('');
-    setAdditional('');
+    setStartSubscription("");
+    setAdditional("");
 
     closeModal();
   };
@@ -115,16 +120,29 @@ export const ModalWindow = (props: ModalEdithProps) => {
 
             <YStack>
               <Text>Оплаченные занятия:</Text>
-              <Input
-                value={paidLessons?.toString() || "0"}
-                onChangeText={(text) => setPaidLessons(parseInt(text))}
-                keyboardType="numeric"
-              />
+              <XStack>
+                <View style={{ flex: 1.5 }}>
+                  <Input
+                    value={paidLessons?.toString() || "0"}
+                    onChangeText={(text) => setPaidLessons(parseInt(text))}
+                    keyboardType="numeric"
+                  />
+                </View>
+                <View style={{ flex: 1 }}>
+                </View>
+                <View style={{ flex: 1.3 }}>
+                  <Button onPress={() => setOpenModalDateList(true)}>
+                    History
+                  </Button>
+                </View>
+              </XStack>
             </YStack>
 
-            <XStack style={{ alignItems: "center" }} >
-              <View style={{ flex: 2 }}><Text>Абонемент c: {startSubscription}</Text></View>
-              
+            <XStack style={{ alignItems: "center" }}>
+              <View style={{ flex: 2 }}>
+                <Text>Абонемент c: {startSubscription}</Text>
+              </View>
+
               <View style={{ flex: 1 }}>
                 <Button onPress={() => setOpenCalendar(true)}>change</Button>
 
@@ -146,7 +164,7 @@ export const ModalWindow = (props: ModalEdithProps) => {
                 onChangeText={(text) => setAdditional(text)}
                 multiline={true}
                 numberOfLines={6}
-                verticalAlign='top'
+                verticalAlign="top"
               />
             </YStack>
 
@@ -167,6 +185,11 @@ export const ModalWindow = (props: ModalEdithProps) => {
                 Save
               </Button>
             </XStack>
+            <ModalDateList
+              modalVisible={openModalDateList}
+              studentsList={visitHistory}
+              closeModalList={handleCloseDateListModal}
+            />
           </YStack>
         </View>
       </View>

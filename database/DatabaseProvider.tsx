@@ -18,7 +18,7 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({
       <DatabaseInitializer onInitialized={() => setIsInitialized(true)} />
 
       {/* start */}
-      {/* <DatabaseResetter /> */}
+      <DatabaseResetter />
       {/* end */}
 
       {isInitialized ? children : null}
@@ -68,11 +68,7 @@ const DatabaseResetter: React.FC = () => {
 
         const { exists } = await FileSystem.getInfoAsync(dbPath);
         if (exists) {
-          // try {
-          //   await AsyncStorage.setItem("isLoggedIn", "false");
-          // } catch (e) {
-          //   console.log("storage not clean");
-          // }
+
           await FileSystem.deleteAsync(dbPath);
           console.log("Database file deleted successfully");
         }

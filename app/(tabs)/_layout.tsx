@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { StatusBar } from "expo-status-bar";
-import { Button, Checkbox, Input, Text, XStack, YStack } from "tamagui";
+import { Button, Checkbox, Input, Text, XStack, YStack, Sheet } from "tamagui";
 import { Link } from "expo-router";
 import { FlashList } from "@shopify/flash-list";
 import { SQLiteDatabase, useSQLiteContext } from "expo-sqlite";
@@ -8,6 +8,10 @@ import { Pressable, SafeAreaView, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import STUDENTS from "../../STUDENTS.json";
 import { StudentsDescription } from "../../types/dbTypes";
+import { ModalWindow } from "../../components/ModalWindow";
+import DateTimePicker, {
+  DateTimePickerEvent,
+} from "@react-native-community/datetimepicker";
 
 interface CountersDescription {
   visitors: number;
@@ -26,11 +30,26 @@ export default function ShantiClass() {
   const [searchTerm, setSearchTerm] = useState("");
   const insets = useSafeAreaInsets();
 
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const [selectedStudent, setSelectedStudent] =
+    useState<StudentsDescription | null>(null);
+
   const [counters, setCounters] = useState<CountersDescription>({
     visitors: 0,
     subscribers: 0,
     unSubscribers: 0,
   });
+
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [openCalendar, setOpenCalendar] = useState(false);
+
+  const handleChangeData = (event: any, selectDate?: Date) => {
+    if (event.type === 'set' && selectDate) {
+      setCurrentDate(selectDate);
+    }
+    setOpenCalendar(false);
+  };
 
   const filteredStudents = useMemo(() => {
     if (!searchTerm.trim()) {
@@ -48,7 +67,7 @@ export default function ShantiClass() {
     setStudents(STUDENTS);
     setVisited(initialVisited);
     setLoading(false);
-  }, []);
+  }, [STUDENTS, db]);
 
   const handleToggleCheck = (studentId: number) => {
     const id = studentId.toString();
@@ -78,9 +97,19 @@ export default function ShantiClass() {
 
       return {
         ...prev,
-        [id]: !isCurrentlyChecked, // Переключаем состояние
+        [id]: !isCurrentlyChecked,
       };
     });
+  };
+
+  const handleOpenModal = (student?: StudentsDescription) => {
+    if (student) setSelectedStudent(student);
+    setModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedStudent(null);
+    setModalVisible(false);
   };
 
   if (loading) {
@@ -115,12 +144,12 @@ export default function ShantiClass() {
         >
           <Link href="/statistic">
             <XStack style={{ paddingRight: 30 }}>
-              <Text style={{ fontWeight: '800'}}>statistic</Text>
+              <Text style={{ fontWeight: "800" }}>statistic</Text>
             </XStack>
           </Link>
-          <Text>По абонименту:  {counters.subscribers}</Text>
-          <Text>Разовое:  {counters.unSubscribers}</Text>
-          <Text>Sarvasya:  {counters.visitors}</Text>
+          <Text>По абонименту: {counters.subscribers}</Text>
+          <Text>Разовое: {counters.unSubscribers}</Text>
+          <Text>Sarvasya: {counters.visitors}</Text>
         </XStack>
 
         {/* Поиск */}
@@ -133,6 +162,21 @@ export default function ShantiClass() {
             autoCapitalize="none"
             autoCorrect={false}
           />
+          <Button
+            onPress={() => {}}
+            style={{
+              backgroundColor: "#2ecc71",
+              height: 40,
+              paddingHorizontal: 12,
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: 6,
+            }}
+          >
+            <XStack style={{ alignItems: "center" }} gap={4}>
+              <Text color="white">Новый</Text>
+            </XStack>
+          </Button>
         </XStack>
 
         {/* Заголовок таблицы */}
@@ -146,15 +190,31 @@ export default function ShantiClass() {
             marginBottom: 8,
           }}
         >
-          <Text flex={1} style={{ textAlign: "center", fontWeight: "bold" }}>
-            nāma
-          </Text>
-          <Text flex={1} style={{ textAlign: "center", fontWeight: "bold" }}>
-            Оплачено занятий
-          </Text>
-          <Text flex={1} style={{ textAlign: "center", fontWeight: "bold" }}>
-            Сегодня
-          </Text>
+          <View style={{ flex: 1 }}>
+            <Text style={{ textAlign: "center", fontWeight: "bold" }}>
+              nāma
+            </Text>
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={{ textAlign: "center", fontWeight: "bold" }}>
+              Оплачено занятий
+            </Text>
+          </View>
+
+          <View style={{ flex: 1 }}>
+            <Button onPress={() => setOpenCalendar(true)}>
+              {currentDate.toLocaleDateString()}
+            </Button>
+
+            {openCalendar && (
+              <DateTimePicker
+                value={currentDate}
+                onChange={handleChangeData}
+                mode="date"
+                display="calendar"
+              />
+            )}
+          </View>
         </XStack>
 
         {/* Список студентов */}
@@ -174,27 +234,28 @@ export default function ShantiClass() {
                   alignItems: "center",
                 }}
               >
-                <Text flex={1} style={{ textAlign: "left" }}>
-                  {item.name}
-                </Text>
-                <Text flex={1} style={{ textAlign: "center" }}>
-                  {item.paidLessons ?? 0}
-                </Text>
+                <Pressable
+                  style={{ flex: 1 }}
+                  onPress={() => handleOpenModal(item)}
+                >
+                  <View style={{ width: "100%" }}>
+                    <Text style={{ textAlign: "left" }}>{item.name}</Text>
+                  </View>
+                </Pressable>
+
+                <View style={{ flex: 1, alignItems: "center" }}>
+                  <Text flex={1} style={{ textAlign: "center" }}>
+                    {item.paidLessons ?? 0}
+                  </Text>
+                </View>
+
                 <XStack
-                  flex={1}
                   style={{
+                    flex: 1,
                     justifyContent: "center",
                     alignItems: "center",
                   }}
                 >
-                  {/* <Pressable
-                  onPress={() => handleToggleCheck(item.id)}
-                  // hitSlop={{ top: 1, bottom: 1, left: 1, right: 1 }} 
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}> */}
                   <Checkbox
                     style={{
                       height: 20,
@@ -204,11 +265,7 @@ export default function ShantiClass() {
                       borderRadius: 3,
                       backgroundColor: visited[item.id] ? "#e6f7ff" : "white",
                     }}
-                    onCheckedChange={
-                      () => handleToggleCheck(item.id)
-                      // Обновление состояния посещаемости
-                      // Например: updateAttendance(item.id, isChecked);
-                    }
+                    onCheckedChange={() => handleToggleCheck(item.id)}
                   >
                     <Checkbox.Indicator>
                       <View
@@ -223,13 +280,17 @@ export default function ShantiClass() {
                       />
                     </Checkbox.Indicator>
                   </Checkbox>
-                  {/* </Pressable> */}
                 </XStack>
               </XStack>
             )}
             keyExtractor={(item) => item.id.toString()}
           />
         </YStack>
+        <ModalWindow
+          modalVisible={modalVisible}
+          closeModal={handleCloseModal}
+          editedStudent={selectedStudent}
+        />
       </YStack>
     </SafeAreaView>
   );

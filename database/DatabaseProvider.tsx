@@ -18,7 +18,7 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({
       <DatabaseInitializer onInitialized={() => setIsInitialized(true)} />
 
       {/* start */}
-      <DatabaseResetter />
+      {/* <DatabaseResetter /> */}
       {/* end */}
 
       {isInitialized ? children : null}

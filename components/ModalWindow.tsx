@@ -1,7 +1,7 @@
 import { Modal, Pressable, View } from "react-native";
 import { Input, XStack, Text, YStack, Checkbox, Button } from "tamagui";
 import { ModalType, StudentsDescription } from "../types/dbTypes";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { ModalDateList } from "./ModalDateList";
 import { insertStudent } from "../database/api/insertStudent";
@@ -32,10 +32,17 @@ export const ModalWindow = (props: ModalEdithProps) => {
   );
   const [visitHistory] = useState(editedStudent?.history || []);
   const [additional, setAdditional] = useState(editedStudent?.additional || "");
-
   const [openCalendar, setOpenCalendar] = useState(false);
-
   const [openModalDateList, setOpenModalDateList] = useState(false);
+
+  const resetForm = useCallback((student?: StudentsDescription | null) => {
+    setName(student?.name || "");
+    setInstagram(student?.instagram || "@");
+    setPaidLessons(student?.paidLessons || 0);
+    setInputPaidLessons((student?.paidLessons ?? 0).toString());
+    setStartSubscription(student?.startSubscription || "");
+    setAdditional(student?.additional || "");
+  }, []);
 
   const handleCloseDateListModal = () => setOpenModalDateList(false);
 
@@ -48,13 +55,12 @@ export const ModalWindow = (props: ModalEdithProps) => {
 
   const handleSveChanges = async () => {
     //сохраняю изменения в базу
-
     if (modalType === "new") {
       try {
         const newStudentData = {
           name,
           instagram,
-          paidLessons: paidLessons,
+          paidLessons,
           startSubscription,
           additional,
           hasSubscription: startSubscription === "" ? 0 : 1,
@@ -84,27 +90,24 @@ export const ModalWindow = (props: ModalEdithProps) => {
       }
     }
 
-    //clean state
-    setName("");
-    setInstagram("");
-    setPaidLessons(0);
-    setStartSubscription("");
-    setAdditional("");
+    resetForm(null);
     closeModal();
-    setInputPaidLessons('0')
   };
 
   const handleCloseModal = () => {
-    //clean state
-    setName("");
-    setInstagram("");
-    setPaidLessons(0);
-    setStartSubscription("");
-    setAdditional("");
-    setInputPaidLessons('0')
-
+    resetForm(null);
     closeModal();
   };
+
+  useEffect(() => {
+    if (modalVisible) {
+      if (modalType === "new") {
+        resetForm(null);
+      } else {
+        resetForm(editedStudent);
+      }
+    }
+  }, [modalVisible, editedStudent, modalType, resetForm]);
 
   return (
     <Modal
@@ -169,13 +172,10 @@ export const ModalWindow = (props: ModalEdithProps) => {
                   <Input
                     value={inputPaidLessins}
                     onChangeText={(text) => {
-                      console.error(text);
-                      setInputPaidLessons(text); 
-
+                      setInputPaidLessons(text);
                       if (/^\d*$/.test(text)) {
                         setPaidLessons(parseInt(text, 10));
-
-                      } else if(text === '') {
+                      } else if (text === "") {
                         setPaidLessons(0);
                       }
                     }}

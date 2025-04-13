@@ -20,7 +20,7 @@ interface CountersDescription {
 export default function ShantiClass() {
   const [loading, setLoading] = useState(true);
   const db = useSQLiteContext();
-  const { students, setStudents } = useStudents();
+  const { students } = useStudents();
 
   const [visited, setVisited] = useState<Record<string, boolean>>({});
 
@@ -112,10 +112,14 @@ export default function ShantiClass() {
     });
   };
 
-  const handleOpenModal = (student?: StudentsDescription) => {
-    if (student) setSelectedStudent(student);
+  const handleOpenModal = () => {
     setModalVisible(true);
   };
+
+  const handleOpenEditModal = (student: StudentsDescription) => {
+    setSelectedStudent(student);
+    setModalVisible(true);
+  }
 
   const handleCloseModal = async () => {
     setSelectedStudent(null);
@@ -251,7 +255,7 @@ export default function ShantiClass() {
                   style={{ flex: 1 }}
                   onPress={() => {
                     setModalType("old");
-                    handleOpenModal(item);
+                    handleOpenEditModal(item);
                   }}
                 >
                   <View style={{ width: "100%" }}>

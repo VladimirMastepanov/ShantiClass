@@ -1,16 +1,15 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { StatusBar } from "expo-status-bar";
-import { Button, Checkbox, Input, Text, XStack, YStack, Sheet } from "tamagui";
+import { Button, Checkbox, Input, Text, XStack, YStack } from "tamagui";
 import { Link } from "expo-router";
 import { FlashList } from "@shopify/flash-list";
 import { SQLiteDatabase, useSQLiteContext } from "expo-sqlite";
-import { Pressable, SafeAreaView, ScrollView, View } from "react-native";
+import { Pressable, SafeAreaView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import STUDENTS from "../../STUDENTS.json";
-import { StudentsDescription } from "../../types/dbTypes";
+import { ModalType, StudentsDescription } from "../../types/dbTypes";
 import { ModalWindow } from "../../components/ModalWindow";
-import DateTimePicker, {
-} from "@react-native-community/datetimepicker";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { useStudents } from "../../context/studentsContext";
 
 interface CountersDescription {
   visitors: number;
@@ -21,7 +20,7 @@ interface CountersDescription {
 export default function ShantiClass() {
   const [loading, setLoading] = useState(true);
   const db = useSQLiteContext();
-  const [students, setStudents] = useState<StudentsDescription[]>([]);
+  const { students, setStudents } = useStudents();
 
   const [visited, setVisited] = useState<Record<string, boolean>>({});
 
@@ -30,6 +29,7 @@ export default function ShantiClass() {
   const insets = useSafeAreaInsets();
 
   const [modalVisible, setModalVisible] = useState(false);
+  const [modalType, setModalType] = useState<ModalType>(null);
 
   const [selectedStudent, setSelectedStudent] =
     useState<StudentsDescription | null>(null);
@@ -44,29 +44,35 @@ export default function ShantiClass() {
   const [openCalendar, setOpenCalendar] = useState(false);
 
   const handleChangeData = (event: any, selectDate?: Date) => {
-    if (event.type === 'set' && selectDate) {
+    if (event.type === "set" && selectDate) {
       setCurrentDate(selectDate);
     }
     setOpenCalendar(false);
   };
 
   const filteredStudents = useMemo(() => {
-    if (!searchTerm.trim()) {
-      return students;
+    if (students) {
+      if (!searchTerm.trim()) {
+        return students;
+      }
+      const searchTermLower = searchTerm.toLowerCase();
+      return students.filter(
+        (student) =>
+          student.name.toLowerCase().includes(searchTermLower) ||
+          student.instagram?.toLowerCase().includes(searchTerm)
+      );
     }
-    const searchTermLower = searchTerm.toLowerCase();
-    return students.filter((student) =>
-      student.name.toLowerCase().includes(searchTermLower)
-    );
   }, [students, searchTerm]);
 
   useEffect(() => {
-    const initialVisited: Record<string, boolean> = {};
-    STUDENTS.forEach((s) => (initialVisited[s.id.toString()] = false));
-    setStudents(STUDENTS);
-    setVisited(initialVisited);
-    setLoading(false);
-  }, [STUDENTS, db]);
+    if (students) {
+      const initialVisited: Record<string, boolean> = {};
+      students.forEach((s) => (initialVisited[s.id.toString()] = false));
+      setVisited(initialVisited);
+
+      setLoading(false);
+    }
+  }, [db, students]);
 
   const handleToggleCheck = (studentId: number) => {
     const id = studentId.toString();
@@ -74,26 +80,31 @@ export default function ShantiClass() {
     setVisited((prev) => {
       const isCurrentlyChecked = prev[id] || false; // текущее состояние
 
-      const targetStudent = students.find((s) => s.id === studentId);
-      if (!targetStudent) return prev;
+      if (students) {
+        const targetStudent = students.find((s) => s.id === studentId);
+        if (!targetStudent) return prev;
 
-      // Обновляем счетчики внутри колбэка setVisited
-      setCounters((prevCounters) => {
-        return {
-          visitors: prevCounters.visitors + (isCurrentlyChecked ? -1 : 1),
-          subscribers:
-            prevCounters.subscribers +
-            (targetStudent.hasSubscription ? (isCurrentlyChecked ? -1 : 1) : 0),
-          unSubscribers:
-            prevCounters.unSubscribers +
-            (!targetStudent.hasSubscription
-              ? isCurrentlyChecked
-                ? -1
-                : 1
-              : 0),
-        };
-      });
-
+        // Обновляем счетчики внутри колбэка setVisited
+        setCounters((prevCounters) => {
+          return {
+            visitors: prevCounters.visitors + (isCurrentlyChecked ? -1 : 1),
+            subscribers:
+              prevCounters.subscribers +
+              (targetStudent.hasSubscription
+                ? isCurrentlyChecked
+                  ? -1
+                  : 1
+                : 0),
+            unSubscribers:
+              prevCounters.unSubscribers +
+              (!targetStudent.hasSubscription
+                ? isCurrentlyChecked
+                  ? -1
+                  : 1
+                : 0),
+          };
+        });
+      }
       return {
         ...prev,
         [id]: !isCurrentlyChecked,
@@ -106,7 +117,7 @@ export default function ShantiClass() {
     setModalVisible(true);
   };
 
-  const handleCloseModal = () => {
+  const handleCloseModal = async () => {
     setSelectedStudent(null);
     setModalVisible(false);
   };
@@ -162,7 +173,10 @@ export default function ShantiClass() {
             autoCorrect={false}
           />
           <Button
-            onPress={() => handleOpenModal()}
+            onPress={() => {
+              setModalType("new");
+              handleOpenModal();
+            }}
             style={{
               backgroundColor: "#2ecc71",
               height: 40,
@@ -235,7 +249,10 @@ export default function ShantiClass() {
               >
                 <Pressable
                   style={{ flex: 1 }}
-                  onPress={() => handleOpenModal(item)}
+                  onPress={() => {
+                    setModalType("old");
+                    handleOpenModal(item);
+                  }}
                 >
                   <View style={{ width: "100%" }}>
                     <Text style={{ textAlign: "left" }}>{item.name}</Text>
@@ -286,6 +303,7 @@ export default function ShantiClass() {
           />
         </YStack>
         <ModalWindow
+          modalType={modalType}
           modalVisible={modalVisible}
           closeModal={handleCloseModal}
           editedStudent={selectedStudent}

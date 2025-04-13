@@ -1,7 +1,4 @@
-import {
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
+import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { SplashScreen, Stack } from "expo-router";
 import { TamaguiProvider } from "tamagui";
 import { useFonts } from "expo-font";
@@ -12,6 +9,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { config } from "../tamagui.config";
 import { DatabaseProvider } from "../database/DatabaseProvider";
 import React from "react";
+import { StudentsProvider } from "../context/studentsContext";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -43,10 +41,12 @@ export default function RootLayout() {
         <DatabaseProvider>
           <TamaguiProvider config={config} defaultTheme="light">
             <ThemeProvider value={DefaultTheme}>
-              <Stack screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="(tabs)" />
-                <Stack.Screen name="statistic" />
-              </Stack>
+              <StudentsProvider>
+                <Stack screenOptions={{ headerShown: false }}>
+                  <Stack.Screen name="(tabs)" />
+                  <Stack.Screen name="statistic" />
+                </Stack>
+              </StudentsProvider>
             </ThemeProvider>
           </TamaguiProvider>
         </DatabaseProvider>

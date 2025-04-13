@@ -1,24 +1,32 @@
 import { Modal, Pressable, View } from "react-native";
 import { Input, XStack, Text, YStack, Checkbox, Button } from "tamagui";
-import { StudentsDescription } from "../types/dbTypes";
+import { ModalType, StudentsDescription } from "../types/dbTypes";
 import { useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { ModalDateList } from "./ModalDateList";
+import { insertStudent } from "../database/api/insertStudent";
+import { useSQLiteContext } from "expo-sqlite";
+import { updateStudent } from "../database/api/updateStudent";
+import { useStudents } from "../context/studentsContext";
 
 interface ModalEdithProps {
+  modalType: ModalType;
   modalVisible: boolean;
   editedStudent?: StudentsDescription | null;
   closeModal: () => void;
 }
 
 export const ModalWindow = (props: ModalEdithProps) => {
-  const { modalVisible, editedStudent, closeModal } = props;
+  const { modalType, modalVisible, editedStudent, closeModal } = props;
 
+  const db = useSQLiteContext();
+  const { setShouldRefresh } = useStudents();
   const [name, setName] = useState(editedStudent?.name || "");
-  const [instagram, setInstagram] = useState(editedStudent?.instagram || "");
+  const [instagram, setInstagram] = useState(editedStudent?.instagram || "@");
   const [paidLessons, setPaidLessons] = useState(
     editedStudent?.paidLessons || 0
   );
+  const [inputPaidLessins, setInputPaidLessons] = useState("0");
   const [startSubscription, setStartSubscription] = useState(
     editedStudent?.startSubscription || ""
   );
@@ -38,8 +46,43 @@ export const ModalWindow = (props: ModalEdithProps) => {
     setOpenCalendar(false);
   };
 
-  const handleSveChanges = () => {
+  const handleSveChanges = async () => {
     //сохраняю изменения в базу
+
+    if (modalType === "new") {
+      try {
+        const newStudentData = {
+          name,
+          instagram,
+          paidLessons: paidLessons,
+          startSubscription,
+          additional,
+          hasSubscription: startSubscription === "" ? 0 : 1,
+        };
+        await insertStudent(db, newStudentData);
+        setShouldRefresh(true);
+      } catch (err) {
+        console.error("Error inserting new student:", err);
+      }
+    }
+    if (modalType === "old" && editedStudent) {
+      try {
+        const updatingStudent = {
+          id: editedStudent?.id,
+          name,
+          instagram,
+          hasSubscription: editedStudent.hasSubscription,
+          startSubscription,
+          additional,
+          paidLessons,
+          history: editedStudent.history,
+        };
+        await updateStudent(db, updatingStudent);
+        setShouldRefresh(true);
+      } catch (err) {
+        console.error("error updaiting student:", err);
+      }
+    }
 
     //clean state
     setName("");
@@ -47,8 +90,8 @@ export const ModalWindow = (props: ModalEdithProps) => {
     setPaidLessons(0);
     setStartSubscription("");
     setAdditional("");
-
     closeModal();
+    setInputPaidLessons('0')
   };
 
   const handleCloseModal = () => {
@@ -58,6 +101,7 @@ export const ModalWindow = (props: ModalEdithProps) => {
     setPaidLessons(0);
     setStartSubscription("");
     setAdditional("");
+    setInputPaidLessons('0')
 
     closeModal();
   };
@@ -123,13 +167,22 @@ export const ModalWindow = (props: ModalEdithProps) => {
               <XStack>
                 <View style={{ flex: 1.5 }}>
                   <Input
-                    value={paidLessons?.toString() || "0"}
-                    onChangeText={(text) => setPaidLessons(parseInt(text))}
+                    value={inputPaidLessins}
+                    onChangeText={(text) => {
+                      console.error(text);
+                      setInputPaidLessons(text); 
+
+                      if (/^\d*$/.test(text)) {
+                        setPaidLessons(parseInt(text, 10));
+
+                      } else if(text === '') {
+                        setPaidLessons(0);
+                      }
+                    }}
                     keyboardType="numeric"
                   />
                 </View>
-                <View style={{ flex: 1 }}>
-                </View>
+                <View style={{ flex: 1 }}></View>
                 <View style={{ flex: 1.3 }}>
                   <Button onPress={() => setOpenModalDateList(true)}>
                     History

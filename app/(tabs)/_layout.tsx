@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { StatusBar } from "expo-status-bar";
 import { Button, Checkbox, Input, Text, XStack, YStack } from "tamagui";
 import { Link } from "expo-router";
@@ -10,6 +16,7 @@ import { ModalType, StudentsDescription } from "../../types/dbTypes";
 import { ModalWindow } from "../../components/ModalWindow";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useStudents } from "../../context/studentsContext";
+import { LoadingElement } from "../../components/Loading";
 
 interface CountersDescription {
   visitors: number;
@@ -51,17 +58,15 @@ export default function ShantiClass() {
   };
 
   const filteredStudents = useMemo(() => {
-    if (students) {
-      if (!searchTerm.trim()) {
-        return students;
-      }
-      const searchTermLower = searchTerm.toLowerCase();
-      return students.filter(
-        (student) =>
-          student.name.toLowerCase().includes(searchTermLower) ||
-          student.instagram?.toLowerCase().includes(searchTerm)
-      );
-    }
+    if (!students) return [];
+    if (!searchTerm.trim()) return students;
+
+    const searchTermLower = searchTerm.toLowerCase();
+    return students.filter(
+      (student) =>
+        student.name.toLowerCase().includes(searchTermLower) ||
+        student.instagram?.toLowerCase().includes(searchTermLower)
+    );
   }, [students, searchTerm]);
 
   useEffect(() => {
@@ -112,28 +117,24 @@ export default function ShantiClass() {
     });
   };
 
-  const handleOpenModal = () => {
+  const handleOpenModal = useCallback(() => {
+    setModalType("new");
     setModalVisible(true);
-  };
+  }, []);
 
-  const handleOpenEditModal = (student: StudentsDescription) => {
+  const handleOpenEditModal = useCallback((student: StudentsDescription) => {
+    setModalType("old");
     setSelectedStudent(student);
     setModalVisible(true);
-  }
+  }, []);
 
-  const handleCloseModal = async () => {
+  const handleCloseModal = useCallback(() => {
     setSelectedStudent(null);
     setModalVisible(false);
-  };
+  }, []);
 
   if (loading) {
-    return (
-      <SafeAreaView
-        style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-      >
-        <Text>Загрузка...</Text>
-      </SafeAreaView>
-    );
+    return <LoadingElement />;
   }
 
   return (
@@ -177,10 +178,7 @@ export default function ShantiClass() {
             autoCorrect={false}
           />
           <Button
-            onPress={() => {
-              setModalType("new");
-              handleOpenModal();
-            }}
+            onPress={handleOpenModal}
             style={{
               backgroundColor: "#2ecc71",
               height: 40,
@@ -254,11 +252,10 @@ export default function ShantiClass() {
                 <Pressable
                   style={{ flex: 1 }}
                   onPress={() => {
-                    setModalType("old");
                     handleOpenEditModal(item);
                   }}
                 >
-                  <View style={{ width: "100%" }}>
+                  <View style={{ width: "100%", ...(item.hasSubscription ? {} : { backgroundColor: '#dddddd' })}}>
                     <Text style={{ textAlign: "left" }}>{item.name}</Text>
                   </View>
                 </Pressable>

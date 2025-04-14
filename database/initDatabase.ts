@@ -12,15 +12,20 @@ export const initDatabase = async (
     hasSubscription BOOLEAN NOT NULL CHECK (hasSubscription IN (0, 1)),
     startSubscription TIMESTAMP,
     paidLessons INTEGER,
-    additional TEXT,
-    history TEXT
+    additional TEXT
     );`,
       `CREATE TABLE IF NOT EXISTS VisitStatistic (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     date TIMESTAMP,
-    singed INTEGER,
-    unSinged INTEGER
+    signed INTEGER,
+    unsigned INTEGER
     );`,
+      `CREATE TABLE IF NOT EXISTS VisitHistory (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    studentId INTEGER NOT NULL,
+    visitDate TEXT NOT NULL,
+    FOREIGN KEY (studentId) REFERENCES Students(id) ON DELETE CASCADE
+    );`
     ];
 
     for (const query of tables) {
@@ -43,3 +48,4 @@ export const initDatabase = async (
     console.error("Error init database:", e);
   }
 };
+ 

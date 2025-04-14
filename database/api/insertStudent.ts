@@ -7,8 +7,8 @@ export const insertStudent = async (
 ) => {
   const query = `
         INSERT OR IGNORE INTO Students (
-        name, instagram, hasSubscription, startSubscription, paidLessons, additional, history
-        ) VALUES (?, ?, ?, ?, ?, ?, ?);
+        name, instagram, hasSubscription, startSubscription, paidLessons, additional
+        ) VALUES (?, ?, ?, ?, ?, ?);
         `;
 
   const value = [
@@ -18,7 +18,6 @@ export const insertStudent = async (
     student.startSubscription,
     student.paidLessons,
     student.additional,
-    JSON.stringify([]),
   ];
 
   try {

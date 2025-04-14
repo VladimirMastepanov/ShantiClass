@@ -5,9 +5,8 @@ import { initDatabase } from "./initDatabase";
 //start
 import * as FileSystem from "expo-file-system";
 import { AppState, AppStateStatus } from "react-native";
+import { DATABASE_NAME, dbPath } from "./helpers.ts/backUpDb";
 //end
-
-const DATABASE_NAME = "app.db";
 
 export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -63,12 +62,8 @@ const DatabaseResetter: React.FC = () => {
   useEffect(() => {
     const resetDatabase = async () => {
       try {
-        const dbDir = `${FileSystem.documentDirectory}/SQLite`;
-        const dbPath = `${dbDir}/${DATABASE_NAME}`;
-
         const { exists } = await FileSystem.getInfoAsync(dbPath);
         if (exists) {
-
           await FileSystem.deleteAsync(dbPath);
           console.log("Database file deleted successfully");
         }
@@ -87,7 +82,7 @@ const DatabaseResetter: React.FC = () => {
     };
     const subscription = AppState.addEventListener(
       "change",
-      handleAppStateChange,
+      handleAppStateChange
     );
     return () => {
       subscription.remove();

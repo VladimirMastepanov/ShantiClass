@@ -21,21 +21,24 @@ export const ModalWindow = (props: ModalEdithProps) => {
 
   const db = useSQLiteContext();
   const { setShouldRefresh } = useStudents();
+  const [id, setId] = useState(editedStudent?.id || null); 
   const [name, setName] = useState(editedStudent?.name || "");
   const [instagram, setInstagram] = useState(editedStudent?.instagram || "@");
   const [paidLessons, setPaidLessons] = useState(
     editedStudent?.paidLessons || 0
   );
-  const [inputPaidLessins, setInputPaidLessons] = useState("0");
+  const [inputPaidLessons, setInputPaidLessons] = useState(
+    (editedStudent?.paidLessons || 0).toString()
+  );
   const [startSubscription, setStartSubscription] = useState(
     editedStudent?.startSubscription || ""
   );
-  const [visitHistory] = useState(editedStudent?.history || []);
   const [additional, setAdditional] = useState(editedStudent?.additional || "");
   const [openCalendar, setOpenCalendar] = useState(false);
   const [openModalDateList, setOpenModalDateList] = useState(false);
 
   const resetForm = useCallback((student?: StudentsDescription | null) => {
+    setId(student?.id || null);
     setName(student?.name || "");
     setInstagram(student?.instagram || "@");
     setPaidLessons(student?.paidLessons || 0);
@@ -48,7 +51,7 @@ export const ModalWindow = (props: ModalEdithProps) => {
 
   const handleChangeData = (event: any, selectDate?: Date) => {
     if (event.type === "set" && selectDate) {
-      setStartSubscription(selectDate.toLocaleDateString());
+      setStartSubscription(selectDate.toISOString().split('T')[0]);
     }
     setOpenCalendar(false);
   };
@@ -71,17 +74,16 @@ export const ModalWindow = (props: ModalEdithProps) => {
         console.error("Error inserting new student:", err);
       }
     }
-    if (modalType === "old" && editedStudent) {
+    if (modalType === "old" && editedStudent && id) {
       try {
         const updatingStudent = {
-          id: editedStudent?.id,
+          id,
           name,
           instagram,
           hasSubscription: editedStudent.hasSubscription,
           startSubscription,
           additional,
           paidLessons,
-          history: editedStudent.history,
         };
         await updateStudent(db, updatingStudent);
         setShouldRefresh(true);
@@ -89,7 +91,6 @@ export const ModalWindow = (props: ModalEdithProps) => {
         console.error("error updaiting student:", err);
       }
     }
-
     resetForm(null);
     closeModal();
   };
@@ -170,13 +171,13 @@ export const ModalWindow = (props: ModalEdithProps) => {
               <XStack>
                 <View style={{ flex: 1.5 }}>
                   <Input
-                    value={inputPaidLessins}
+                    value={inputPaidLessons}
                     onChangeText={(text) => {
                       setInputPaidLessons(text);
-                      if (/^\d*$/.test(text)) {
-                        setPaidLessons(parseInt(text, 10));
-                      } else if (text === "") {
+                      if (text === "") {
                         setPaidLessons(0);
+                      } else if (/^\d+$/.test(text)) {
+                        setPaidLessons(parseInt(text, 10));
                       }
                     }}
                     keyboardType="numeric"
@@ -240,7 +241,7 @@ export const ModalWindow = (props: ModalEdithProps) => {
             </XStack>
             <ModalDateList
               modalVisible={openModalDateList}
-              studentsList={visitHistory}
+              studentId={id}
               closeModalList={handleCloseDateListModal}
             />
           </YStack>

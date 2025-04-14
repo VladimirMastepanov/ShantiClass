@@ -1,16 +1,33 @@
+import { SQLiteDatabase, useSQLiteContext } from "expo-sqlite";
+import { useEffect, useState } from "react";
 import { FlatList, Modal, View } from "react-native";
-import { Text,  Button } from "tamagui";
-
-
+import { Text, Button } from "tamagui";
+import { getStudentVisitDates } from "../database/api/getStudentVisitDates";
 
 interface ModalDateListProps {
   modalVisible: boolean;
-  studentsList?: string[];
+  studentId: number | null;
   closeModalList: () => void;
 }
 
 export const ModalDateList = (props: ModalDateListProps) => {
-  const {modalVisible, studentsList, closeModalList} = props;
+  const { modalVisible, studentId, closeModalList } = props;
+
+  const db = useSQLiteContext();
+  const [dateList, setDateList] = useState<string[]>([]);
+
+  useEffect(() => {
+    const loadData = async (id: number, db: SQLiteDatabase) => {
+      try {
+        const visitDates = await getStudentVisitDates(id, db);
+        setDateList(visitDates);
+      } catch (err) {
+        console.error("Ошибка загрузки дат посещения: ", err);
+      }
+    };
+
+    if (studentId) loadData(studentId, db);
+  }, [db, studentId]);
 
   return (
     <Modal
@@ -38,7 +55,7 @@ export const ModalDateList = (props: ModalDateListProps) => {
           <Text style={{ fontSize: 18, marginBottom: 10 }}>Список дат:</Text>
 
           <FlatList
-            data={studentsList}
+            data={dateList}
             renderItem={({ item }) => (
               <Text style={{ padding: 10, fontSize: 16 }}>{item}</Text>
             )}
@@ -60,4 +77,4 @@ export const ModalDateList = (props: ModalDateListProps) => {
       </View>
     </Modal>
   );
-}
+};

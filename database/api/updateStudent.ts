@@ -13,8 +13,7 @@ export const updateStudent = async (
           hasSubscription = ?, 
           startSubscription = ?, 
           paidLessons = ?, 
-          additional = ?, 
-          history = ?
+          additional = ?
         WHERE id = ?
         `;
 
@@ -25,7 +24,6 @@ export const updateStudent = async (
     student.startSubscription,
     student.paidLessons,
     student.additional,
-    JSON.stringify(student.history),
     student.id,
   ];
 

@@ -1,7 +1,5 @@
 import { SQLiteDatabase } from "expo-sqlite";
 import { StudentsDescription, StudentsFromDbDescription } from "../../types/dbTypes";
-import { prepareStudents } from "../helpers.ts/prepareHistory";
-
 
 export const getAllStudents = async (
   db: SQLiteDatabase,
@@ -13,7 +11,7 @@ export const getAllStudents = async (
       console.log("Students Data - []");
       return [];
     }
-    return prepareStudents(res);
+    return res;
   } catch (error) {
     console.error("Error fetching students data:", error);
     return [];

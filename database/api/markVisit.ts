@@ -1,34 +1,49 @@
 import { SQLiteDatabase } from "expo-sqlite";
+import { updateStudentSubscription } from "./updateStudentSubscription";
 
 export const markVisit = async (
   studentId: number,
   visitDate: string,
-  hasSubscription: boolean,
+  hasSubscription: number | null,
   db: SQLiteDatabase
 ) => {
   try {
+    console.error("markVisit, visitDate:", visitDate);
     await db.withTransactionAsync(async () => {
-      const insertVisitQery =
-        "INSERT INTO VisitHistory (studentId, visitDate) VALUES (?, ?);";
-      await db.runAsync(insertVisitQery, [studentId, visitDate]);
+      let deducted = 0;
 
-      if (hasSubscription) {
+      if (hasSubscription === 1) {
         const query =
           "UPDATE Students SET paidLessons = paidLessons - 1 WHERE id = ? AND paidLessons > 0;";
-        await db.runAsync(query, [studentId]);
+        const updateRes = await db.runAsync(query, [studentId]);
+        deducted = updateRes.changes > 0 ? 1 : 0;
+        console.error("updateRes.changes:", updateRes.changes);
+        console.error("deducted:", deducted);
       }
 
-      const updateQuery = hasSubscription
-        ? `UPDATE VisitStatistic SET signed = signed + 1 WHERE date = ?;`
-        : `UPDATE VisitStatistic SET unsigned = unsigned + 1 WHERE date = ?;`;
+      await updateStudentSubscription(studentId, db);
+
+      const insertVisitQuery =
+        "INSERT INTO VisitHistory (studentId, visitDate, deducted) VALUES (?, ?, ?);";
+      const insertVisitRTes = await db.runAsync(insertVisitQuery, [
+        studentId,
+        visitDate,
+        deducted,
+      ]);
+      console.error("markVisit insertVisitRTes:", insertVisitRTes.changes);
+      const updateQuery =
+        hasSubscription === 1
+          ? `UPDATE VisitStatistic SET signed = signed + 1 WHERE date = ?;`
+          : `UPDATE VisitStatistic SET unsigned = unsigned + 1 WHERE date = ?;`;
 
       try {
         await db.runAsync(updateQuery, [visitDate]);
       } catch (e) {
         try {
-          const insertValue = hasSubscription
-            ? { signed: 1, unsigned: 0 }
-            : { signed: 0, unsigned: 1 };
+          const insertValue =
+            hasSubscription === 1
+              ? { signed: 1, unsigned: 0 }
+              : { signed: 0, unsigned: 1 };
           const insertQuery =
             "INSERT INTO VisitStatistic (date, signed, unsigned) VALUES (?, ?, ?);";
           await db.runAsync(insertQuery, [

@@ -1,6 +1,14 @@
 
 export type PaidLessons = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
+export type StudentsMarksType = Record<string, boolean>;
+
+export interface VisitDescription {
+  visitors: number;
+  subscribers: number;
+  unSubscribers: number;
+}
+
 export interface StudentsDescription {
   id: number;
   name: string;
@@ -33,7 +41,7 @@ export interface StudentsFromDbDescription {
 
 export interface VisitStatisticDescription {
   id: number;
-  date: Date;
+  date: string; // Date
   signed: number;
   unsigned: number;
 }
@@ -41,7 +49,8 @@ export interface VisitStatisticDescription {
 export interface VisitHistoryDescription {
   id: number;
   studentId: number;
-  visitDate: Date;
+  visitDate: string;
+  deducted: number;
 }
 
 export type ModalType = 'new' | 'old' | null;

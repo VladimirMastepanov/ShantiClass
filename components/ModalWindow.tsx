@@ -7,7 +7,8 @@ import { ModalDateList } from "./ModalDateList";
 import { insertStudent } from "../database/api/insertStudent";
 import { useSQLiteContext } from "expo-sqlite";
 import { updateStudent } from "../database/api/updateStudent";
-import { useStudents } from "../context/studentsContext";
+import { useStudentsContext } from "../context/studentsContext";
+import { normolizeDate } from "../utilities/dateToYYMMDD";
 
 interface ModalEdithProps {
   modalType: ModalType;
@@ -20,8 +21,8 @@ export const ModalWindow = (props: ModalEdithProps) => {
   const { modalType, modalVisible, editedStudent, closeModal } = props;
 
   const db = useSQLiteContext();
-  const { setShouldRefresh } = useStudents();
-  const [id, setId] = useState(editedStudent?.id || null); 
+  const { setShouldRefresh } = useStudentsContext();
+  const [id, setId] = useState(editedStudent?.id || null);
   const [name, setName] = useState(editedStudent?.name || "");
   const [instagram, setInstagram] = useState(editedStudent?.instagram || "@");
   const [paidLessons, setPaidLessons] = useState(
@@ -51,7 +52,7 @@ export const ModalWindow = (props: ModalEdithProps) => {
 
   const handleChangeData = (event: any, selectDate?: Date) => {
     if (event.type === "set" && selectDate) {
-      setStartSubscription(selectDate.toISOString().split('T')[0]);
+      setStartSubscription(normolizeDate(selectDate));
     }
     setOpenCalendar(false);
   };
@@ -185,7 +186,7 @@ export const ModalWindow = (props: ModalEdithProps) => {
                 </View>
                 <View style={{ flex: 1 }}></View>
                 <View style={{ flex: 1.3 }}>
-                  <Button onPress={() => setOpenModalDateList(true)}>
+                  <Button style={{color: "white", backgroundColor: "#8FD2E6"}}  onPress={() => setOpenModalDateList(true)}>
                     History
                   </Button>
                 </View>
@@ -198,7 +199,7 @@ export const ModalWindow = (props: ModalEdithProps) => {
               </View>
 
               <View style={{ flex: 1 }}>
-                <Button onPress={() => setOpenCalendar(true)}>change</Button>
+                <Button style={{color: "white", backgroundColor: "#8FD2E6"}} onPress={() => setOpenCalendar(true)}>Change</Button>
 
                 {openCalendar && (
                   <DateTimePicker
@@ -227,13 +228,13 @@ export const ModalWindow = (props: ModalEdithProps) => {
               space={12}
             >
               <Button
-                style={{ backgroundColor: "#e74c3c", color: "white" }}
+                style={{ backgroundColor: "#DFABCF", color: "white" }}
                 onPress={handleCloseModal}
               >
                 Close
               </Button>
               <Button
-                style={{ backgroundColor: "#2ecc71", color: "white" }}
+                style={{ backgroundColor: "#5D7AB5", color: "white" }}
                 onPress={handleSveChanges}
               >
                 Save

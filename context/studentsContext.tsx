@@ -1,4 +1,10 @@
-import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { StudentsDescription } from "../types/dbTypes";
 import { SQLiteDatabase, useSQLiteContext } from "expo-sqlite";
 import { getAllStudents } from "../database/api/getAllStudents";
@@ -8,7 +14,7 @@ interface StudentsContextType {
   students: StudentsDescription[] | null;
   setStudents: (students: StudentsDescription[]) => void;
   shouldRefresh: boolean;
-  setShouldRefresh: (arg: boolean) => void
+  setShouldRefresh: (arg: boolean) => void;
 }
 
 const StudentsContext = createContext<StudentsContextType | undefined>(
@@ -27,30 +33,32 @@ export const StudentsProvider: React.FC<{ children: ReactNode }> = ({
       try {
         await updateAllStudents(db);
         const studentsfromDb = await getAllStudents(db);
-        setStudents(studentsfromDb)
+        setStudents(studentsfromDb);
       } catch (e) {
         console.error(
           "fetching studentsData fromDb for StudentsProvider error:",
-          e,
+          e
         );
       }
-    }
+    };
     loadData(db);
 
-    if(shouldRefresh) {
+    if (shouldRefresh) {
       loadData(db);
       setShouldRefresh(false);
     }
   }, [db, shouldRefresh]);
 
   return (
-    <StudentsContext.Provider value={{ students, setStudents, shouldRefresh, setShouldRefresh }}>
+    <StudentsContext.Provider
+      value={{ students, setStudents, shouldRefresh, setShouldRefresh }}
+    >
       {children}
     </StudentsContext.Provider>
   );
 };
 
-export const useStudents = (): StudentsContextType => {
+export const useStudentsContext = (): StudentsContextType => {
   const context = useContext(StudentsContext);
   if (!context) {
     throw new Error("useStudents must be used within a StudentsProvider");

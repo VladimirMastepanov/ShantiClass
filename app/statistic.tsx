@@ -7,12 +7,12 @@ import {
 
 import { useSQLiteContext } from "expo-sqlite";
 import { exportDb, importDb } from "../database/helpers.ts/backUpDb";
-import { useStudents } from "../context/studentsContext";
+import { useStudentsContext } from "../context/studentsContext";
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const db = useSQLiteContext();
-  const { setShouldRefresh } = useStudents();
+  const { setShouldRefresh } = useStudentsContext();
 
   const handleExportBd = async () => {
     await exportDb();
@@ -39,7 +39,7 @@ export default function ProfileScreen() {
           onPress={importDb}
           style={{
             flex: 1,
-            backgroundColor: "tomato",
+            backgroundColor: "#DFABCF",
             height: 40,
             paddingHorizontal: 12,
             alignItems: "center",
@@ -55,7 +55,7 @@ export default function ProfileScreen() {
           onPress={handleExportBd}
           style={{
             flex: 1,
-            backgroundColor: "tomato",
+            backgroundColor: "#5D7AB5",
             height: 40,
             paddingHorizontal: 12,
             alignItems: "center",

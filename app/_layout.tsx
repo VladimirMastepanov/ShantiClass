@@ -10,6 +10,8 @@ import { config } from "../tamagui.config";
 import { DatabaseProvider } from "../database/DatabaseProvider";
 import React from "react";
 import { StudentsProvider } from "../context/studentsContext";
+import { VisitProvider } from "../context/visitContext";
+import { DateProvider } from "../context/dateContext";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -41,12 +43,16 @@ export default function RootLayout() {
         <DatabaseProvider>
           <TamaguiProvider config={config} defaultTheme="light">
             <ThemeProvider value={DefaultTheme}>
-              <StudentsProvider>
-                <Stack screenOptions={{ headerShown: false }}>
-                  <Stack.Screen name="(tabs)" />
-                  <Stack.Screen name="statistic" />
-                </Stack>
-              </StudentsProvider>
+              <DateProvider>
+                <StudentsProvider>
+                  <VisitProvider>
+                    <Stack screenOptions={{ headerShown: false }}>
+                      <Stack.Screen name="(tabs)" />
+                      <Stack.Screen name="statistic" />
+                    </Stack>
+                  </VisitProvider>
+                </StudentsProvider>
+              </DateProvider>
             </ThemeProvider>
           </TamaguiProvider>
         </DatabaseProvider>

@@ -1,7 +1,7 @@
-import * as SQLite from "expo-sqlite";
+import { SQLiteDatabase } from "expo-sqlite";
 
 export const initDatabase = async (
-  db: SQLite.SQLiteDatabase
+  db: SQLiteDatabase
 ): Promise<void> => {
   const initTables = async () => {
     const tables = [
@@ -10,13 +10,13 @@ export const initDatabase = async (
     name TEXT NOT NULL,
     instagram TEXT,
     hasSubscription BOOLEAN NOT NULL CHECK (hasSubscription IN (0, 1)),
-    startSubscription TIMESTAMP,
+    startSubscription TEXT,
     paidLessons INTEGER,
     additional TEXT
     );`,
       `CREATE TABLE IF NOT EXISTS VisitStatistic (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    date TIMESTAMP,
+    date TEXT,
     signed INTEGER,
     unsigned INTEGER
     );`,
@@ -24,6 +24,7 @@ export const initDatabase = async (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     studentId INTEGER NOT NULL,
     visitDate TEXT NOT NULL,
+    deducted BOOLEAN NOT NULL DEFAULT 0,
     FOREIGN KEY (studentId) REFERENCES Students(id) ON DELETE CASCADE
     );`
     ];

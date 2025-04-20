@@ -1,8 +1,10 @@
 import { SQLiteDatabase, useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
+import { ScrollView } from "react-native";
 import { FlatList, Modal, View } from "react-native";
 import { Text, Button } from "tamagui";
 import { getStudentVisitDates } from "../database/api/getStudentVisitDates";
+import { groupDatesByMonth } from "../utilities/groupDatesByMonth";
 
 interface ModalDateListProps {
   modalVisible: boolean;
@@ -14,13 +16,15 @@ export const ModalDateList = (props: ModalDateListProps) => {
   const { modalVisible, studentId, closeModalList } = props;
 
   const db = useSQLiteContext();
-  const [dateList, setDateList] = useState<string[]>([]);
-
+  const [groupedDates, setGroupedDates] = useState<Record<string, string[]>>(
+    {}
+  );
   useEffect(() => {
     const loadData = async (id: number, db: SQLiteDatabase) => {
       try {
         const visitDates = await getStudentVisitDates(id, db);
-        setDateList(visitDates);
+        const grouped = groupDatesByMonth(visitDates);
+        setGroupedDates(grouped);
       } catch (err) {
         console.error("Ошибка загрузки дат посещения: ", err);
       }
@@ -54,17 +58,24 @@ export const ModalDateList = (props: ModalDateListProps) => {
         >
           <Text style={{ fontSize: 18, marginBottom: 10 }}>Список дат:</Text>
 
-          <FlatList
-            data={dateList}
-            renderItem={({ item }) => (
-              <Text style={{ padding: 10, fontSize: 16 }}>{item}</Text>
-            )}
-            keyExtractor={(item) => item}
-          />
+          <ScrollView>
+            {Object.entries(groupedDates).map(([month, days]) => (
+              <View key={month} style={{ marginBottom: 15 }}>
+                <Text
+                  style={{ color: '#5D7AB5',fontWeight: "bold", fontSize: 16, marginBottom: 5 }}
+                >
+                  {month + ":"}
+                </Text>
+                <Text style={{ fontSize: 15 }}>
+                  {days.join(",  ")}
+                </Text>
+              </View>
+            ))}
+          </ScrollView>
 
           <Button
             style={{
-              backgroundColor: "#e74c3c",
+              backgroundColor: "#DFABCF",
               color: "white",
               marginTop: 20,
               alignSelf: "center",

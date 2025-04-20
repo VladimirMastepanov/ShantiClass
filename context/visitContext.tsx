@@ -36,29 +36,63 @@ export const VisitProvider: React.FC<{ children: ReactNode }> = ({
   const { currentDate } = useDateContext();
 
   useEffect(() => {
-    const loadData = async (db: SQLiteDatabase) => {
+    const loadInitialData = async () => {
       try {
         const statistic = await getVisitStatisticsForDate(currentDate, db);
-        console.error("VisitProvider statistic:", statistic);
         const studentVisits = await getStudentVisitsForDate(currentDate, db);
-        console.error("VisitProvider studentVisits:", studentVisits);
-
         setCounter(statistic);
         setStudentsCurrentDayMarks(studentVisits);
       } catch (e) {
-        console.error(
-          "fetching counterData from Db for CounterProvider error:",
-          e
-        );
+        console.error("Ошибка при загрузке данных в VisitProvider:", e);
       }
     };
-    loadData(db);
+  
+    loadInitialData();
+  }, [currentDate, db]);
+  
+  useEffect(() => {
+    const refreshData = async () => {
+      if (shouldRefreshCounter) {
+        try {
+          const statistic = await getVisitStatisticsForDate(currentDate, db);
+          const studentVisits = await getStudentVisitsForDate(currentDate, db);
+          setCounter(statistic);
+          setStudentsCurrentDayMarks(studentVisits);
+        } catch (e) {
+          console.error("Ошибка при обновлении данных в VisitProvider:", e);
+        } finally {
+          setShouldRefreshCounter(false);
+        }
+      }
+    };
+  
+    refreshData();
+  }, [shouldRefreshCounter, currentDate, db]);
 
-    if (shouldRefreshCounter) {
-      loadData(db);
-      setShouldRefreshCounter(false);
-    }
-  }, [db, shouldRefreshCounter, currentDate]);
+  // useEffect(() => {
+  //   const loadData = async (db: SQLiteDatabase) => {
+  //     try {
+  //       const statistic = await getVisitStatisticsForDate(currentDate, db);
+  //       console.error("VisitProvider statistic:", statistic);
+  //       const studentVisits = await getStudentVisitsForDate(currentDate, db);
+  //       console.error("VisitProvider studentVisits:", studentVisits);
+
+  //       setCounter(statistic);
+  //       setStudentsCurrentDayMarks(studentVisits);
+  //     } catch (e) {
+  //       console.error(
+  //         "fetching counterData from Db for CounterProvider error:",
+  //         e
+  //       );
+  //     }
+  //   };
+  //   loadData(db);
+
+  //   if (shouldRefreshCounter) {
+  //     loadData(db);
+  //     setShouldRefreshCounter(false);
+  //   }
+  // }, [db, shouldRefreshCounter, currentDate]);
 
   return (
     <VisitContext.Provider

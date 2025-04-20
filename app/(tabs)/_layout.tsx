@@ -1,8 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { Button, Input, Text, XStack, YStack } from "tamagui";
 import { Link } from "expo-router";
@@ -38,22 +34,22 @@ export default function ShantiClass() {
   const [openCalendar, setOpenCalendar] = useState(false);
 
   const handleChangeData = (event: any, selectDate?: Date) => {
-    console.error("currentDate:", currentDate);
-    console.error("selectDate:", selectDate);
+    // console.error("currentDate:", currentDate);
+    // console.error("selectDate:", selectDate);
     if (event.type === "set" && selectDate) {
       setCurrentDate(normolizeDate(selectDate));
       setShouldRefresh(true);
       setShouldRefreshCounter(true);
     }
     setOpenCalendar(false);
-    console.error("newDate:", currentDate);
+    // console.error("newDate:", currentDate);
   };
 
   useEffect(() => {
     if (students && counter && studentsCurrentDayMarks) {
-      console.error('useEffect students:', students)
-      console.error('useEffect counter:', counter)
-      console.error('useEffect studentsCurrentDayMarks:', studentsCurrentDayMarks)
+      // console.error('useEffect students:', students)
+      // console.error('useEffect counter:', counter)
+      // console.error('useEffect studentsCurrentDayMarks:', studentsCurrentDayMarks)
       setLoading(false);
     }
   }, [db, students, studentsCurrentDayMarks, counter]);
@@ -98,14 +94,30 @@ export default function ShantiClass() {
             marginBottom: 8,
           }}
         >
-          <Link href="/statistic">
-            <XStack style={{ paddingRight: 30 }}>
+          <Link
+            style={{
+              borderWidth: 1,
+              borderColor: "#DFABCF",
+              paddingHorizontal: 5,
+              justifyContent: "center",
+              alignItems: "center",
+              borderRadius: 10,
+            }}
+            href="/statistic"
+          >
+            <XStack
+              style={{
+                paddingHorizontal: 10,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
               <Text style={{ fontWeight: "800" }}>statistic</Text>
             </XStack>
           </Link>
-          <Text>По абонименту: {counter?.subscribers ?? 0}</Text>
-          <Text>Разовое: {counter?.unSubscribers ?? 0}</Text>
-          <Text>Sarvasya: {counter?.visitors ?? 0}</Text>
+          <Text>По абонименту: {counter?.subscribers || 0}</Text>
+          <Text>Разовое: {counter?.unSubscribers || 0}</Text>
+          <Text>Sarvasya: {counter?.visitors || 0}</Text>
         </XStack>
 
         {/* Поиск */}
@@ -117,12 +129,12 @@ export default function ShantiClass() {
             onChangeText={(text) => setSearchTerm(text)}
             autoCapitalize="none"
             autoCorrect={false}
+            style={{borderColor: '#F1CCE1'}}
           />
           <Button
             onPress={handleOpenModal}
             style={{
               backgroundColor: "#DFABCF",
-              height: 40,
               paddingHorizontal: 12,
               alignItems: "center",
               justifyContent: "center",
@@ -140,34 +152,66 @@ export default function ShantiClass() {
           width="100%"
           style={{
             justifyContent: "space-between",
-            backgroundColor: "gray3",
+            // backgroundColor: "gray3",
             borderRadius: 8,
+            backgroundColor: "#F1CCE1",
             padding: 12,
             marginBottom: 8,
           }}
         >
-          <View style={{ flex: 1 }}>
-            <Text style={{ textAlign: "center", fontWeight: "bold" }}>
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: "#F1CCE1",
+              borderRadius: 8,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text
+              style={{
+                textAlign: "left",
+                fontWeight: "bold",
+                color: "#5D7AB5",
+              }}
+            >
               nāma
             </Text>
           </View>
 
-          <View style={{ flex: 1 }}>
-            <Text style={{ textAlign: "center", fontWeight: "bold" }}>
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: "#F1CCE1",
+              borderRadius: 8,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text
+              style={{
+                textAlign: "center",
+                fontWeight: "bold",
+                color: "#5D7AB5",
+              }}
+            >
               Оплачено занятий
             </Text>
           </View>
 
           <View style={{ flex: 1 }}>
-            <Button style={{backgroundColor: "#F1CCE1"}} onPress={() => setOpenCalendar(true)}>{currentDate}</Button>
+            <Button
+              style={{ backgroundColor: "#F1CCE1", color: "#5D7AB5" }}
+              onPress={() => setOpenCalendar(true)}
+            >
+              {currentDate}
+            </Button>
             {openCalendar && (
               <DateTimePicker
                 value={new Date(normolizeDateType(currentDate))}
                 onChange={handleChangeData}
                 mode="date"
                 display="calendar"
-                
-                
               />
             )}
           </View>

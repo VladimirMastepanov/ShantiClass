@@ -157,11 +157,22 @@ export const ModalWindow = (props: ModalEdithProps) => {
           <YStack space={12}>
             <YStack>
               <Text>Name:</Text>
-              <Input value={name} onChangeText={(text) => setName(text)} />
+              <Input
+                style={{
+                  borderColor: "#8FD2E6",
+                  backgroundColor: "transparent",
+                }}
+                value={name}
+                onChangeText={(text) => setName(text)}
+              />
             </YStack>
             <YStack>
               <Text>Instagram:</Text>
               <Input
+              style={{
+                borderColor: "#8FD2E6",
+                backgroundColor: "transparent",
+              }}
                 value={instagram || ""}
                 onChangeText={(text) => setInstagram(text)}
               />
@@ -172,6 +183,10 @@ export const ModalWindow = (props: ModalEdithProps) => {
               <XStack>
                 <View style={{ flex: 1.5 }}>
                   <Input
+                  style={{
+                    borderColor: "#8FD2E6",
+                    backgroundColor: "transparent",
+                  }}
                     value={inputPaidLessons}
                     onChangeText={(text) => {
                       setInputPaidLessons(text);
@@ -186,7 +201,10 @@ export const ModalWindow = (props: ModalEdithProps) => {
                 </View>
                 <View style={{ flex: 1 }}></View>
                 <View style={{ flex: 1.3 }}>
-                  <Button style={{color: "white", backgroundColor: "#8FD2E6"}}  onPress={() => setOpenModalDateList(true)}>
+                  <Button
+                    style={{ color: "white", backgroundColor: "#8FD2E6" }}
+                    onPress={() => setOpenModalDateList(true)}
+                  >
                     History
                   </Button>
                 </View>
@@ -199,7 +217,12 @@ export const ModalWindow = (props: ModalEdithProps) => {
               </View>
 
               <View style={{ flex: 1 }}>
-                <Button style={{color: "white", backgroundColor: "#8FD2E6"}} onPress={() => setOpenCalendar(true)}>Change</Button>
+                <Button
+                  style={{ color: "white", backgroundColor: "#8FD2E6" }}
+                  onPress={() => setOpenCalendar(true)}
+                >
+                  Change
+                </Button>
 
                 {openCalendar && (
                   <DateTimePicker
@@ -215,6 +238,10 @@ export const ModalWindow = (props: ModalEdithProps) => {
             <YStack>
               <Text>Дополнительная Информация:</Text>
               <Input
+              style={{
+                borderColor: "#8FD2E6",
+                backgroundColor: "transparent",
+              }}
                 value={additional || ""}
                 onChangeText={(text) => setAdditional(text)}
                 multiline={true}

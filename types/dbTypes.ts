@@ -9,6 +9,12 @@ export interface VisitDescription {
   unSubscribers: number;
 }
 
+export interface StatisticDescription {
+  visitDate: string;
+  signed: number | null;
+  unsigned: number | null;
+}
+
 export interface StudentsDescription {
   id: number;
   name: string;

@@ -10,7 +10,7 @@ export const getStudentVisitDates = async (
       "SELECT visitDate FROM VisitHistory WHERE studentId = ? ORDER BY visitDate ASC;";
     const res = await db.getAllAsync<{ visitDate: string }>(query, [studentId]);
     if (!res || res.length === 0) {
-      console.log("Student visit Dates - []");
+      // console.log("Student visit Dates - []");
       return [];
     }
     const dates = res.map((el) => dateToYYMMDD(el.visitDate));

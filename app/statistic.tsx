@@ -30,8 +30,19 @@ export default function ProfileScreen() {
           gap: 8,
         }}
       >
-        <Link href="/">
-          <Text>Return to the visit log</Text>
+        <Link
+          style={{
+            backgroundColor: "#DFABCF",
+            paddingHorizontal: 20,
+            paddingVertical: 10,
+            borderRadius: 6,
+            height: 40,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          href="/"
+        >
+          <Text color="white">Return to the visit log</Text>
         </Link>
       </YStack>
       <XStack width="100%" style={{ marginBottom: 50 }}>

@@ -15,7 +15,7 @@ export const unmarkVisit = async (
       );
 
       if (!result || result.deducted === undefined) {
-        console.error("Нет записи VisitHistory для отмены посещения.");
+        // console.error("Нет записи VisitHistory для отмены посещения.");
         return;
       }
 

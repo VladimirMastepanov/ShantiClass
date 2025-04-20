@@ -38,7 +38,7 @@ export const StudentsFlashList = (props: StudentsFlashListProps) => {
   const handleToggleCheck = async (student: StudentsDescription) => {
     const id = student.id.toString();
     const isCurrentlyChecked = studentsCurrentDayMarks[id] || false;
-    console.error('StudentsFlashList handleToggleCheck studentsCurrentDayMarks:', studentsCurrentDayMarks)
+    // console.error('StudentsFlashList handleToggleCheck studentsCurrentDayMarks:', studentsCurrentDayMarks)
     try {
       if (isCurrentlyChecked) {
         await unmarkVisit(student.id, currentDate, db);
@@ -61,11 +61,12 @@ export const StudentsFlashList = (props: StudentsFlashListProps) => {
         <XStack
           width="100%"
           style={{
-            borderBottomColor: "gray3",
+            borderBottomColor: "#8FD2E6",
             borderBottomWidth: 1,
             padding: 12,
             minHeight: 32,
             alignItems: "center",
+            ...(item.hasSubscription ? {} : { backgroundColor: "#E8E9E9" }),
           }}
         >
           <Pressable
@@ -77,7 +78,9 @@ export const StudentsFlashList = (props: StudentsFlashListProps) => {
             <View
               style={{
                 width: "100%",
-                ...(item.hasSubscription ? {} : { backgroundColor: "#dddddd" }),
+                paddingHorizontal: 10,
+                paddingVertical: 5,
+                borderRadius: 5,
               }}
             >
               <Text style={{ textAlign: "left" }}>{item.name}</Text>
@@ -104,9 +107,9 @@ export const StudentsFlashList = (props: StudentsFlashListProps) => {
                 borderColor: studentsCurrentDayMarks[item.id]
                   ? "#8FD2E6"
                   : "#DFABCF",
-                  backgroundColor: studentsCurrentDayMarks[item.id]
+                backgroundColor: studentsCurrentDayMarks[item.id]
                   ? "#5D7AB5"
-                  : "transparent",
+                  : "white",
                 borderWidth: 1,
                 borderRadius: 3,
               }}

@@ -5,7 +5,7 @@ export const getStudentVisitsForDate = async (
   date: string,
   db: SQLiteDatabase
 ): Promise<StudentsMarksType> => {
-  console.error('getStudentVisitsForDate date:', date)
+  // console.error('getStudentVisitsForDate date:', date)
   try {
     const visitsQuery = `SELECT studentId FROM VisitHistory WHERE visitDate = ?;`;
 
@@ -18,8 +18,8 @@ export const getStudentVisitsForDate = async (
       studentsMarks[el.studentId.toString()] = true;
     });
 
-    console.error('getStudentVisitsForDate visits:', visits)
-    console.error('getStudentVisitsForDate studentsMarks:', studentsMarks)
+    // console.error('getStudentVisitsForDate visits:', visits)
+    // console.error('getStudentVisitsForDate studentsMarks:', studentsMarks)
 
     return studentsMarks;
   } catch (err) {

@@ -15,7 +15,6 @@ export const getVisitStatistic = async (
 
     const result = await db.getAllAsync<StatisticFromDb>(statisticQuery);
     if (result) {
-      console.log(result);
       return result.map((r) => ({
         visitDate: r.visitDate,
         signed: r.signed || 0,

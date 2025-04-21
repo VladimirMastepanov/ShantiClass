@@ -4,21 +4,22 @@
     "slug": "ShantiClass",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/playstore-icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "scheme": "mileng",
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "package": "com.vmas.ShantiClass"
-    }
+      "package": "com.vmas.ShantiClass",
+      "versionCode": 1
+    },
+    "extra": {
+      "eas": {
+        "projectId": "e7d87fa4-7f1e-4751-8525-94707bf2de42"
+      }
+    },
+    "plugins": [
+      "expo-router",
+      "expo-sqlite"
+    ]
   }
 }

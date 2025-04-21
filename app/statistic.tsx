@@ -8,6 +8,7 @@ import { exportDb, importDb } from "../database/helpers.ts/backUpDb";
 import { useStudentsContext } from "../context/studentsContext";
 import { Diagram } from "../components/Diagram";
 import { View } from "react-native";
+import { OmIcon } from "../components/OmIcon";
 
 export default function Tools() {
   const insets = useSafeAreaInsets();
@@ -43,6 +44,7 @@ export default function Tools() {
         >
           <Text color="white">Return to the visit log</Text>
         </Link>
+        <OmIcon />
         <View
           style={{
             flex: 1,

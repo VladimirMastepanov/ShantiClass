@@ -3,8 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { initDatabase } from "./initDatabase";
 
 //start
-import * as FileSystem from "expo-file-system";
-import { AppState, AppStateStatus } from "react-native";
+// import * as FileSystem from "expo-file-system";
+// import { AppState, AppStateStatus } from "react-native";
 import { DATABASE_NAME, dbPath } from "./helpers.ts/backUpDb";
 //end
 
@@ -57,37 +57,37 @@ const DatabaseInitializer: React.FC<DatabaseInitializerProps> = ({
 };
 
 //start
-const DatabaseResetter: React.FC = () => {
-  const appState = useRef(AppState.currentState);
-  useEffect(() => {
-    const resetDatabase = async () => {
-      try {
-        const { exists } = await FileSystem.getInfoAsync(dbPath);
-        if (exists) {
-          await FileSystem.deleteAsync(dbPath);
-          console.log("Database file deleted successfully");
-        }
-      } catch (error) {
-        console.error("Error resetting database:", error);
-      }
-    };
-    const handleAppStateChange = (nextAppState: AppStateStatus) => {
-      if (
-        appState.current === "active" &&
-        (nextAppState === "background" || nextAppState === "inactive")
-      ) {
-        resetDatabase();
-      }
-      appState.current = nextAppState;
-    };
-    const subscription = AppState.addEventListener(
-      "change",
-      handleAppStateChange
-    );
-    return () => {
-      subscription.remove();
-    };
-  }, []);
-  return null;
-};
+// const DatabaseResetter: React.FC = () => {
+//   const appState = useRef(AppState.currentState);
+//   useEffect(() => {
+//     const resetDatabase = async () => {
+//       try {
+//         const { exists } = await FileSystem.getInfoAsync(dbPath);
+//         if (exists) {
+//           await FileSystem.deleteAsync(dbPath);
+//           console.log("Database file deleted successfully");
+//         }
+//       } catch (error) {
+//         console.error("Error resetting database:", error);
+//       }
+//     };
+//     const handleAppStateChange = (nextAppState: AppStateStatus) => {
+//       if (
+//         appState.current === "active" &&
+//         (nextAppState === "background" || nextAppState === "inactive")
+//       ) {
+//         resetDatabase();
+//       }
+//       appState.current = nextAppState;
+//     };
+//     const subscription = AppState.addEventListener(
+//       "change",
+//       handleAppStateChange
+//     );
+//     return () => {
+//       subscription.remove();
+//     };
+//   }, []);
+//   return null;
+// };
 //end

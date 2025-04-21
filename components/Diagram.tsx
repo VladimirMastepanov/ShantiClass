@@ -1,5 +1,5 @@
 import { Text } from "tamagui";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import {
   DiagramColorsDescription,
   DiagramKey,
@@ -7,12 +7,14 @@ import {
 } from "../types/dbTypes";
 import { getVisitStatistic } from "../database/api/getVisitStatistic";
 import { useSQLiteContext } from "expo-sqlite";
-import { View, StyleSheet, ScrollView, Dimensions } from "react-native";
-import { Svg, G, Rect, Text as SvgText } from "react-native-svg";
+import { View, StyleSheet, ScrollView, Dimensions, ActivityIndicator } from "react-native";
 import * as d3 from "d3-scale";
 
 export const Diagram = () => {
   const [visitData, setVisitData] = useState<StatisticDescription[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const scrollViewRef = useRef<ScrollView>(null);
   const db = useSQLiteContext();
 
   const keys = ["signed", "unsigned"] as const;
@@ -26,51 +28,108 @@ export const Diagram = () => {
   const BAR_GAP = 16;
   const chartWidth = useMemo(() => {
     return visitData.length * (BAR_WIDTH + BAR_GAP);
-  }, [visitData]);
+  }, [visitData.length]);
 
   const maxValue = useMemo(() => {
-    return Math.max(...visitData.map((d) => d.signed + d.unsigned));
+    if (visitData.length === 0) return 10; // Значение по умолчанию для пустых данных
+    return Math.max(
+      ...visitData.map((d) => d.signed + d.unsigned),
+      1 // Минимальное значение для предотвращения деления на ноль
+    );
   }, [visitData]);
 
   const yScale = useMemo(() => {
     return d3.scaleLinear().domain([0, maxValue]).range([0, CHART_HEIGHT]);
   }, [maxValue]);
 
+  // Scroll to the end when data is loaded
+  useEffect(() => {
+    if (visitData.length > 0 && scrollViewRef.current) {
+      // Небольшая задержка, чтобы убедиться, что ScrollView полностью отрендерился
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+    }
+  }, [visitData]);
+
   useEffect(() => {
     const getData = async () => {
-      const data = await getVisitStatistic(db);
-      console.log("useEffect getdata data: ", data);
-      const formattedData = data.map((item) => ({
-        ...item,
-        visitDate: new Date(item.visitDate).toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-        }),
-      }));
-
-      console.log("Formatted data:", formattedData);
-      setVisitData(formattedData.reverse());
+      try {
+        setLoading(true);
+        const data = await getVisitStatistic(db);
+        
+        if (data && data.length > 0) {
+          const formattedData = data.map((item) => ({
+            ...item,
+            visitDate: new Date(item.visitDate).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+            }),
+          }));
+          
+          setVisitData(formattedData.reverse());
+        } else {
+          setVisitData([]);
+        }
+      } catch (err) {
+        console.error("Error fetching visit statistics:", err);
+        setError("Failed to load data");
+      } finally {
+        setLoading(false);
+      }
     };
+    
     getData();
-  }, []);
+  }, [db]);
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#8FD2E6" />
+        <Text style={styles.loadingText}>Loading data...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>{error}</Text>
+      </View>
+    );
+  }
+
+  if (visitData.length === 0) {
+    return (
+      <View style={styles.emptyContainer}>
+        <Text style={styles.emptyText}>No data available</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.chartContainer}>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+      <ScrollView 
+        ref={scrollViewRef}
+        horizontal 
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { width: chartWidth > 0 ? chartWidth + 40 : '100%' }
+        ]}
+      >
         <View style={styles.chartRow}>
-          {visitData.map((item) => {
+          {visitData.map((item, index) => {
             const total = item.signed + item.unsigned;
             const signedHeight = (item.signed / maxValue) * 100;
             const unsignedHeight = (item.unsigned / maxValue) * 100;
 
             return (
-              <View key={item.visitDate} style={styles.barGroup}>
+              <View key={`${item.visitDate}-${index}`} style={styles.barGroup}>
                 <Text style={styles.totalText}>{total}</Text>
                 <View style={styles.barArea}>
-                  {/* Bar container */}
                   <View style={styles.barBackground}>
-
-                                        {/* Signed segment */}
+                    {/* Signed segment */}
                     <View
                       style={[
                         styles.barSegment,
@@ -79,11 +138,13 @@ export const Diagram = () => {
                           backgroundColor: colors.signed,
                         },
                       ]}
+                      accessibilityLabel={`Signed: ${item.signed}`}
                     >
                       {item.signed > 0 && (
                         <Text style={styles.valueText}>{item.signed}</Text>
                       )}
                     </View>
+                    
                     {/* Unsigned segment */}
                     <View
                       style={[
@@ -93,13 +154,12 @@ export const Diagram = () => {
                           backgroundColor: colors.unsigned,
                         },
                       ]}
+                      accessibilityLabel={`Unsigned: ${item.unsigned}`}
                     >
                       {item.unsigned > 0 && (
                         <Text style={styles.valueText}>{item.unsigned}</Text>
                       )}
                     </View>
-
-
                   </View>
                 </View>
                 <Text style={styles.label}>{item.visitDate}</Text>
@@ -113,7 +173,10 @@ export const Diagram = () => {
       <View style={styles.legend}>
         {keys.map((key) => (
           <View key={key} style={styles.legendItem}>
-            <View style={[styles.colorBox, { backgroundColor: colors[key] }]} />
+            <View 
+              style={[styles.colorBox, { backgroundColor: colors[key] }]}
+              accessibilityLabel={`${key} color indicator`}
+            />
             <Text style={styles.legendLabel}>{key}</Text>
           </View>
         ))}
@@ -128,6 +191,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     justifyContent: 'center', 
     alignItems: 'center',
+  },
+  scrollContent: {
+    paddingHorizontal: 10,
   },
   chartRow: {
     flexDirection: "row",
@@ -161,12 +227,14 @@ const styles = StyleSheet.create({
   valueText: {
     fontSize: 10,
     color: "#333",
+    fontWeight: "500",
   },
   totalText: {
     marginBottom: 6,
     fontSize: 12,
     color: "#000",
     textAlign: "center",
+    fontWeight: "500",
   },
   label: {
     marginTop: 6,
@@ -177,7 +245,7 @@ const styles = StyleSheet.create({
   legend: {
     marginTop: 20,
     flexDirection: "row",
-    justifyContent: "flex-start",
+    justifyContent: "center",
     gap: 16,
     flexWrap: "wrap",
   },
@@ -196,5 +264,33 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#555",
     textTransform: "capitalize",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  loadingText: {
+    marginTop: 10,
+    color: "#555",
+  },
+  errorContainer: {
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  errorText: {
+    color: "#D32F2F",
+    textAlign: 'center',
+  },
+  emptyContainer: {
+    padding: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyText: {
+    color: "#757575",
+    textAlign: 'center',
   },
 });

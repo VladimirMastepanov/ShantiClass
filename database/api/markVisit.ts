@@ -8,7 +8,6 @@ export const markVisit = async (
   db: SQLiteDatabase
 ) => {
   try {
-    console.error("markVisit, visitDate:", visitDate);
     await db.withTransactionAsync(async () => {
       let deducted = 0;
 
@@ -17,8 +16,6 @@ export const markVisit = async (
           "UPDATE Students SET paidLessons = paidLessons - 1 WHERE id = ? AND paidLessons > 0;";
         const updateRes = await db.runAsync(query, [studentId]);
         deducted = updateRes.changes > 0 ? 1 : 0;
-        // console.error("updateRes.changes:", updateRes.changes);
-        // console.error("deducted:", deducted);
       }
 
       await updateStudentSubscription(studentId, db);
@@ -30,7 +27,6 @@ export const markVisit = async (
         visitDate,
         deducted,
       ]);
-      // console.error("markVisit insertVisitRTes:", insertVisitRTes.changes);
       const updateQuery =
         hasSubscription === 1
           ? `UPDATE VisitStatistic SET signed = signed + 1 WHERE date = ?;`

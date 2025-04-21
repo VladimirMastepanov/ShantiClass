@@ -34,22 +34,16 @@ export default function ShantiClass() {
   const [openCalendar, setOpenCalendar] = useState(false);
 
   const handleChangeData = (event: any, selectDate?: Date) => {
-    // console.error("currentDate:", currentDate);
-    // console.error("selectDate:", selectDate);
     if (event.type === "set" && selectDate) {
       setCurrentDate(normolizeDate(selectDate));
       setShouldRefresh(true);
       setShouldRefreshCounter(true);
     }
     setOpenCalendar(false);
-    // console.error("newDate:", currentDate);
   };
 
   useEffect(() => {
     if (students && counter && studentsCurrentDayMarks) {
-      // console.error('useEffect students:', students)
-      // console.error('useEffect counter:', counter)
-      // console.error('useEffect studentsCurrentDayMarks:', studentsCurrentDayMarks)
       setLoading(false);
     }
   }, [db, students, studentsCurrentDayMarks, counter]);
@@ -112,7 +106,7 @@ export default function ShantiClass() {
                 alignItems: "center",
               }}
             >
-              <Text style={{ fontWeight: "800" }}>statistic</Text>
+              <Text style={{ fontWeight: "800" }}>tools</Text>
             </XStack>
           </Link>
           <Text>По абонименту: {counter?.subscribers || 0}</Text>
@@ -152,7 +146,6 @@ export default function ShantiClass() {
           width="100%"
           style={{
             justifyContent: "space-between",
-            // backgroundColor: "gray3",
             borderRadius: 8,
             backgroundColor: "#F1CCE1",
             padding: 12,

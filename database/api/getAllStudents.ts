@@ -8,7 +8,6 @@ export const getAllStudents = async (
     const query = "SELECT * FROM Students ORDER BY hasSubscription DESC, name COLLATE NOCASE;";
     const res = await db.getAllAsync<StudentsFromDbDescription>(query);
     if (!res || res.length === 0) {
-      // console.log("Students Data - []");
       return [];
     }
     return res;

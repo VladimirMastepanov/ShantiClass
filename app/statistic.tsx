@@ -4,14 +4,13 @@ import {
   SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
-
-import { useSQLiteContext } from "expo-sqlite";
 import { exportDb, importDb } from "../database/helpers.ts/backUpDb";
 import { useStudentsContext } from "../context/studentsContext";
+import { Diagram } from "../components/Diagram";
+import { View } from "react-native";
 
-export default function ProfileScreen() {
+export default function Tools() {
   const insets = useSafeAreaInsets();
-  const db = useSQLiteContext();
   const { setShouldRefresh } = useStudentsContext();
 
   const handleExportBd = async () => {
@@ -27,7 +26,7 @@ export default function ProfileScreen() {
           alignItems: "center",
           paddingTop: insets.top + 10,
           paddingHorizontal: 16,
-          gap: 8,
+          gap: 16,
         }}
       >
         <Link
@@ -44,41 +43,55 @@ export default function ProfileScreen() {
         >
           <Text color="white">Return to the visit log</Text>
         </Link>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            width: "100%",
+            marginBottom: 40,
+            paddingBottom: 30,
+          }}
+        >
+          <Diagram />
+        </View>
+
+        <XStack width="100%" style={{ marginBottom: 16 }}>
+          <Button
+            onPress={importDb}
+            style={{
+              flex: 1,
+              backgroundColor: "#DFABCF",
+              height: 40,
+              paddingHorizontal: 12,
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: 6,
+              marginRight: 8,
+            }}
+          >
+            <XStack style={{ alignItems: "center" }} gap={4}>
+              <Text color="white">Загрузить базу данных</Text>
+            </XStack>
+          </Button>
+          <Button
+            onPress={handleExportBd}
+            style={{
+              flex: 1,
+              backgroundColor: "#5D7AB5",
+              height: 40,
+              paddingHorizontal: 12,
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: 6,
+            }}
+          >
+            <XStack style={{ alignItems: "center" }} gap={4}>
+              <Text color="white">Сохранить базу данных</Text>
+            </XStack>
+          </Button>
+        </XStack>
       </YStack>
-      <XStack width="100%" style={{ marginBottom: 50 }}>
-        <Button
-          onPress={importDb}
-          style={{
-            flex: 1,
-            backgroundColor: "#DFABCF",
-            height: 40,
-            paddingHorizontal: 12,
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: 6,
-          }}
-        >
-          <XStack style={{ alignItems: "center" }} gap={4}>
-            <Text color="white">Загрузить базу данных</Text>
-          </XStack>
-        </Button>
-        <Button
-          onPress={handleExportBd}
-          style={{
-            flex: 1,
-            backgroundColor: "#5D7AB5",
-            height: 40,
-            paddingHorizontal: 12,
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: 6,
-          }}
-        >
-          <XStack style={{ alignItems: "center" }} gap={4}>
-            <Text color="white">Сохранить базу данных</Text>
-          </XStack>
-        </Button>
-      </XStack>
     </SafeAreaView>
   );
 }

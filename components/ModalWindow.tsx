@@ -1,5 +1,5 @@
 import { Modal, Pressable, View } from "react-native";
-import { Input, XStack, Text, YStack, Checkbox, Button } from "tamagui";
+import { Input, XStack, Text, YStack, Button } from "tamagui";
 import { ModalType, StudentsDescription } from "../types/dbTypes";
 import { useCallback, useEffect, useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -58,7 +58,6 @@ export const ModalWindow = (props: ModalEdithProps) => {
   };
 
   const handleSveChanges = async () => {
-    //сохраняю изменения в базу
     if (modalType === "new") {
       try {
         const newStudentData = {

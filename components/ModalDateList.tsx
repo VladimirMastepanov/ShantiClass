@@ -1,7 +1,7 @@
 import { SQLiteDatabase, useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
 import { ScrollView } from "react-native";
-import { FlatList, Modal, View } from "react-native";
+import { Modal, View } from "react-native";
 import { Text, Button } from "tamagui";
 import { getStudentVisitDates } from "../database/api/getStudentVisitDates";
 import { groupDatesByMonth } from "../utilities/groupDatesByMonth";

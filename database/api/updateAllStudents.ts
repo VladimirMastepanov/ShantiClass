@@ -10,7 +10,6 @@ export const updateAllStudents = async (db: SQLiteDatabase) => {
     END;`;
   try {
     await db.runAsync(query);
-    // console.log(`Updated students subsription informaion successfully.`);
   } catch (error) {
     console.error("Error updating subscription information:", error);
   }

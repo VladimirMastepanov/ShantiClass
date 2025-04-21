@@ -1,4 +1,3 @@
-
 export type PaidLessons = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
 export type StudentsMarksType = Record<string, boolean>;
@@ -11,6 +10,11 @@ export interface VisitDescription {
 
 export interface StatisticDescription {
   visitDate: string;
+  signed: number;
+  unsigned: number;
+}
+export interface StatisticFromDb {
+  visitDate: string;
   signed: number | null;
   unsigned: number | null;
 }
@@ -20,17 +24,16 @@ export interface StudentsDescription {
   name: string;
   instagram: string | null;
   hasSubscription: number | null;
-  startSubscription: string | null; // Date
+  startSubscription: string | null;
   paidLessons: number | null;
   additional: string | null;
-  // history: string[]; // array of dates: dd/mm/yy
 }
 
 export interface NewStudentDescription {
   name: string;
   instagram: string | null;
   hasSubscription: number | null;
-  startSubscription: string | null; // Date
+  startSubscription: string | null;
   paidLessons: number | null;
   additional: string | null;
 }
@@ -40,14 +43,14 @@ export interface StudentsFromDbDescription {
   name: string;
   instagram: string;
   hasSubscription: number;
-  startSubscription: string; // Date
+  startSubscription: string;
   paidLessons: number;
   additional: string;
 }
 
 export interface VisitStatisticDescription {
   id: number;
-  date: string; // Date
+  date: string;
   signed: number;
   unsigned: number;
 }
@@ -59,10 +62,11 @@ export interface VisitHistoryDescription {
   deducted: number;
 }
 
-export type ModalType = 'new' | 'old' | null;
+export type ModalType = "new" | "old" | null;
 
+export interface DiagramColorsDescription {
+  signed: string;
+  unsigned: string;
+}
 
-// export interface StudentsHistory {
-//   date: Date;
-//   names: string[];
-// }
+export type DiagramKey = keyof DiagramColorsDescription;

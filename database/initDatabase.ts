@@ -32,7 +32,7 @@ export const initDatabase = async (
     for (const query of tables) {
       await db.execAsync(query);
     }
-    console.log("initTables ok");
+    // console.log("initTables ok");
   };
 
   try {
@@ -41,9 +41,9 @@ export const initDatabase = async (
     );
 
     if (!tablesInitialized) {
-      console.log("!tablesInitialized");
+      // console.log("!tablesInitialized");
       await initTables();
-      console.log("await initTables()");
+      // console.log("await initTables()");
     }
   } catch (e) {
     console.error("Error init database:", e);

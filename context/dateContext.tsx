@@ -2,10 +2,8 @@ import {
   createContext,
   ReactNode,
   useContext,
-  useEffect,
   useState,
 } from "react";
-import { SQLiteDatabase, useSQLiteContext } from "expo-sqlite";
 import { normolizeDate } from "../utilities/dateToYYMMDD";
 
 interface DateContextType {

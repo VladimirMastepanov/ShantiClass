@@ -10,7 +10,6 @@ export const getVisitStatisticsForDate = async (
     subscribers: 0,
     unSubscribers: 0,
   };
-  console.error('getVisitStatisticsForDate date:', date)
   try {
     const statisticQuery = `SELECT (signed + unsigned) as visitors,
         signed as subscribers,
@@ -25,7 +24,6 @@ export const getVisitStatisticsForDate = async (
       return defaultStatistic;
     }
 
-    console.error('getVisitStatisticsForDate statistic:', statistic)
     return statistic;
   } catch (err) {
     console.error("Ошибка при получении статистики посещений:", err);

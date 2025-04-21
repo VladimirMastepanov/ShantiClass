@@ -5,7 +5,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import { SQLiteDatabase, useSQLiteContext } from "expo-sqlite";
+import { useSQLiteContext } from "expo-sqlite";
 import { useDateContext } from "./dateContext";
 import { StudentsMarksType, VisitDescription } from "../types/dbTypes";
 import { getStudentVisitsForDate } from "../database/api/getStudentVisitsForDate";
@@ -68,31 +68,6 @@ export const VisitProvider: React.FC<{ children: ReactNode }> = ({
   
     refreshData();
   }, [shouldRefreshCounter, currentDate, db]);
-
-  // useEffect(() => {
-  //   const loadData = async (db: SQLiteDatabase) => {
-  //     try {
-  //       const statistic = await getVisitStatisticsForDate(currentDate, db);
-  //       console.error("VisitProvider statistic:", statistic);
-  //       const studentVisits = await getStudentVisitsForDate(currentDate, db);
-  //       console.error("VisitProvider studentVisits:", studentVisits);
-
-  //       setCounter(statistic);
-  //       setStudentsCurrentDayMarks(studentVisits);
-  //     } catch (e) {
-  //       console.error(
-  //         "fetching counterData from Db for CounterProvider error:",
-  //         e
-  //       );
-  //     }
-  //   };
-  //   loadData(db);
-
-  //   if (shouldRefreshCounter) {
-  //     loadData(db);
-  //     setShouldRefreshCounter(false);
-  //   }
-  // }, [db, shouldRefreshCounter, currentDate]);
 
   return (
     <VisitContext.Provider

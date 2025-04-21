@@ -1,7 +1,9 @@
 import { SQLiteDatabase } from "expo-sqlite";
-import { StatisticDescription } from "../../types/dbTypes";
+import { StatisticDescription, StatisticFromDb } from "../../types/dbTypes";
 
-export const getVisitStatistic = async (db: SQLiteDatabase): Promise<StatisticDescription[]>  => {
+export const getVisitStatistic = async (
+  db: SQLiteDatabase
+): Promise<StatisticDescription[]> => {
   try {
     const statisticQuery = `SELECT VisitHistory.visitDate, 
              SUM(CASE WHEN Students.hasSubscription = 1 THEN 1 ELSE 0 END) AS signed,
@@ -11,10 +13,15 @@ export const getVisitStatistic = async (db: SQLiteDatabase): Promise<StatisticDe
       GROUP BY VisitHistory.visitDate
       ORDER BY VisitHistory.visitDate DESC;`;
 
-      const result = await db.getAllAsync<StatisticDescription>(statisticQuery);
-      if (result) {
-        return result;
-      }
+    const result = await db.getAllAsync<StatisticFromDb>(statisticQuery);
+    if (result) {
+      console.log(result);
+      return result.map((r) => ({
+        visitDate: r.visitDate,
+        signed: r.signed || 0,
+        unsigned: r.unsigned || 0,
+      }));
+    }
     return [];
   } catch (error) {
     console.error("Error fetching visit statistic:", error);

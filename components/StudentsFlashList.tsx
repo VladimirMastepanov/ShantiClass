@@ -38,7 +38,6 @@ export const StudentsFlashList = (props: StudentsFlashListProps) => {
   const handleToggleCheck = async (student: StudentsDescription) => {
     const id = student.id.toString();
     const isCurrentlyChecked = studentsCurrentDayMarks[id] || false;
-    // console.error('StudentsFlashList handleToggleCheck studentsCurrentDayMarks:', studentsCurrentDayMarks)
     try {
       if (isCurrentlyChecked) {
         await unmarkVisit(student.id, currentDate, db);
